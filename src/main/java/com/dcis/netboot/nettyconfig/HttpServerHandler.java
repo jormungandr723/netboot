@@ -99,19 +99,27 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                                     NettyControlllerModel controlllerModel) throws InvocationTargetException, IllegalAccessException, UnsupportedEncodingException {
         List params=paramsHandle(request,controlllerModel,response);
         String reJson="";
+
       if(void.class.equals(controlllerModel.getMethod().getReturnType())){
           controlllerModel.getMethod().invoke(controlllerModel.getObj(),
                   params.toArray(new Object[params.size()]));
+
+
       }else {
           Object obj=controlllerModel.getMethod().invoke(controlllerModel.getObj(),
                   params.toArray(new Object[params.size()]));
           reJson=JSON.toJSONString(obj);
+
       }
-        byte[] responseBytes = reJson.getBytes(UTF8);
-        int contentLength = responseBytes.length;
-        response.content().writeBytes(responseBytes);
-        response.headers().set("Content-Type", "application/json; charset=utf-8");
-        response.headers().set("Content-Length", Integer.toString(contentLength));
+        if(!response.content().isReadable()){
+            //response默认返回值
+            byte[] responseBytes = reJson.getBytes(UTF8);
+            response.content().writeBytes(responseBytes);
+            int contentLength = responseBytes.length;
+            response.headers().set("Content-Type", "application/json; charset=utf-8");
+            response.headers().set("Content-Length", Integer.toString(contentLength));
+        }
+
 
     }
 
