@@ -20,9 +20,11 @@ import java.util.Map;
 
 /**
  * @author Reverie
+ * http处理类
  */
 public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     private Map firpath;
+
     private static final String GET_FLAG="?";
     private static  final String UTF8="UTF-8";
     @Override
@@ -33,29 +35,8 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
             // 请求，解码器将请求转换成HttpRequest对象
             FullHttpRequest request = (FullHttpRequest) msg;
             FullHttpResponse response=new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,HttpResponseStatus.OK);
+            //执行请求
             actReq(request,response);
-//            if(request.content().isReadable()){
-//                String json=request.content().toString(Charset.forName("Utf-8"));
-//            }
-//
-//            // 获取请求参数
-//            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.uri());
-//            String name = "netty";
-//
-//            if(queryStringDecoder.parameters().get("name") != null) {
-//                name = queryStringDecoder.parameters().get("name").get(0);
-//            }
-//
-//            // 响应HTML
-//            String responseHtml = "<html><body>Hello, " + name + "</body></html>";
-//            byte[] responseBytes = responseHtml.getBytes("UTF-8");
-//            int contentLength = responseBytes.length;
-//
-//            // 构造FullHttpResponse对象，FullHttpResponse包含message body
-//            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(responseBytes));
-//            response.headers().set("Content-Type", "text/html; charset=utf-8");
-//            response.headers().set("Content-Length", Integer.toString(contentLength));
-
             ctx.writeAndFlush(response);
         }
     }
@@ -119,8 +100,6 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
             response.headers().set("Content-Type", "application/json; charset=utf-8");
             response.headers().set("Content-Length", Integer.toString(contentLength));
         }
-
-
     }
 
     private Object transCusObj(FullHttpRequest request,Class beencls){
@@ -137,7 +116,6 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     private List<Object> paramsHandle(FullHttpRequest request,NettyControlllerModel controlllerModel,FullHttpResponse response){
         controlllerModel.getMethod().getTypeParameters();
         Class<?>[] types=controlllerModel.getMethod().getParameterTypes();
-
         List<Object> params = new ArrayList<>(4);
         for (int j = 0; j < types.length; j++) {
             Class cls=types[j];
@@ -165,10 +143,6 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
             }
         }
-
-
-
-
         return params;
     }
 

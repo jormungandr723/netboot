@@ -32,12 +32,14 @@ public class Httpserver {
                         public void initChannel(SocketChannel ch)  {
                             ChannelPipeline pipeline = ch.pipeline();
                             pipeline.addLast(new HttpServerCodec());
+                            //聚合Request并设置最大值(防止出现多次进入处理类)
                             pipeline.addLast(new HttpObjectAggregator(65336));
                             HttpServerHandler httpServerHandler=new HttpServerHandler();
                             httpServerHandler.setFirpath(fstPath);
                             pipeline.addLast(httpServerHandler);
                         }
                     });
+            //绑定端口
             ChannelFuture f = b.bind(nettyconfig.getPort()).sync();
             f.channel().closeFuture().sync();
         } finally {
@@ -66,6 +68,7 @@ public class Httpserver {
                             NettyControlllerModel nettyControlllerModel=new NettyControlllerModel();
                             nettyControlllerModel.setObj(obj);
                             nettyControlllerModel.setMethod(m);
+                            //api地址寻址匹配表
                             fstPath.put(nettyconfig.getWebpath()+mapping.value()+memapping.value(),nettyControlllerModel);
                     }
 
